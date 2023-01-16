@@ -1,9 +1,5 @@
 package Main;
 
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Map;
-
 public class Logic {
 
 	private int position;

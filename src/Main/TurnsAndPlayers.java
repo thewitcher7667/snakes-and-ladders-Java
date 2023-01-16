@@ -19,7 +19,7 @@ public class TurnsAndPlayers extends OfflinePanel{
 	JComboBox playersNumbers;
 	JComboBox colorBox;
 	final String[] numbers = new String[] {"2","3","4","5","6"};
-	final String[] colorsComboBox = new String[] {"white","Red","Blue","Green","Black","Yellow"};
+	final String[] colorsComboBox = new String[] {"Orange","Red","Blue","Green","Black","Yellow"};
     List<Color> colors = new LinkedList<Color>();
     List<Player> players = new LinkedList<Player>();
     List<Player> activePlayers = new LinkedList<Player>();
@@ -34,7 +34,7 @@ public class TurnsAndPlayers extends OfflinePanel{
 		colorssLabel = new JLabel("Colors");
 		colorBox = new JComboBox(colorsComboBox);
 		//colors
-		colors.add(Color.WHITE);
+		colors.add(Color.ORANGE);
 		colors.add(Color.RED);
 		colors.add(Color.BLUE);
 		colors.add(Color.GREEN);

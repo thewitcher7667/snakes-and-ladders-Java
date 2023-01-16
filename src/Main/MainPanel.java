@@ -50,7 +50,7 @@ public class MainPanel extends JPanel{
      
      private void offlineButtonAction()
      {
-    	 main.frame.setContentPane(new OfflinePanel());
+    	 main.frame.setContentPane(new TurnsAndPlayers());
      }
      
      private void settingButtonAction()

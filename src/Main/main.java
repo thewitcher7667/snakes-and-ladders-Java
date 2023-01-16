@@ -20,9 +20,9 @@ public class main {
 		frame = new JFrame();
         readPlayer();
 				
-		frame.getContentPane().add(new TurnsAndPlayers());
+		//frame.getContentPane().add(new TurnsAndPlayers());
 
-		//frame.getContentPane().add(new MainPanel());
+		frame.getContentPane().add(new MainPanel());
 		
 		frame.setSize(900,700);
 		frame.setResizable(false);

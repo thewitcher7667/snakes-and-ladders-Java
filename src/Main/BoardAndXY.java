@@ -4,10 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
