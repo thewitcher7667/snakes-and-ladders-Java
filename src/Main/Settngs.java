@@ -16,14 +16,11 @@ public class Settngs extends JOptionPane {
 	Color[] colors;
 	JPanel panel;
 	JTextField field1;
-	JComboBox box;
 	JLabel labelName;
 	JLabel labelColor;
 	
 	Settngs()
-	{
-	    colors = new Color[] {Color.WHITE,Color.BLUE,Color.RED,Color.GREEN};
-		
+	{		
 		style = new Style();
 	    panel = new JPanel(new FlowLayout(FlowLayout.CENTER,1,5));
 	    
@@ -35,13 +32,8 @@ public class Settngs extends JOptionPane {
 	    
 	    field1 = new JTextField(10);
 	    
-	    String[] colorsNames = new String[] {"White","Blue","Red","Green"};
-	    box = new JComboBox(colorsNames);
-	    
 	    panel.add(labelName);
 	    panel.add(field1);
-	    panel.add(labelColor);
-	    panel.add(box);
 	    
 	    showMessageDialog(null, panel);
 	    getInputes();
@@ -51,13 +43,12 @@ public class Settngs extends JOptionPane {
 	{
 		if(field1.getText().equals("") || field1.getText().length()>20)
 		{
-			showMessageDialog(null, "Color Only Saved");
+			showMessageDialog(null, "Didint Save");
 		}
 		else
 		{
 			main.player.setName(field1.getText());
 		}
-		main.player.setColor(colors[box.getSelectedIndex()]);
 		main.savePlayer(main.player);
 	}
 }

@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -22,15 +23,18 @@ public class OfflinePanel extends JPanel{
 	
 	 private JPanel notBoardPanel; 
      private Style style;
+     TurnsAndPlayers turns ;
      BoardAndXY board;
      JTextArea area;
      JButton play;
      JScrollPane s;
      Dice dice;
-     Player pc;
      JLabel playerLabel;
-     boolean firstTime;
 	 Logic l ;
+	 int oneHundredPorition =0 ;
+	 int currenPlayerNumber =0;
+	 List<Player> activePlayers;
+	 boolean played;
 	 
 	    //ladders
 	    public static final Map<Integer,Integer> laddersAndSnakes;
@@ -59,14 +63,12 @@ public class OfflinePanel extends JPanel{
      
      OfflinePanel()
      {
-    	 firstTime =true;
     	 l = new Logic();
-    	 pc = new Player("Pc",Color.BLACK);
+    	 played = false;
     	 
     	 this.setLayout(new BorderLayout());
     	 
     	 style = new Style();
-    	 board = new BoardAndXY(main.player,pc);
     	 notBoardPanel = new JPanel();
     	 dice = new Dice();
     	 playerLabel = new JLabel();
@@ -97,18 +99,14 @@ public class OfflinePanel extends JPanel{
     	 notBoardPanel.add(dice);
     	 notBoardPanel.add(play);
 
-    	 add(board,BorderLayout.WEST);
     	 add(notBoardPanel,BorderLayout.EAST);
 
- 		//initiate truns and player and pc
-    	 startTurns();
      }
      
 	public void playActionPerformed()
 	{	
-		//test case for all positions
-		/*
-   	 for(int i =0;i<=100;i++)
+	//test case for all positions	
+   /*	 for(int i =0;i<=100;i++)
    	 {
        	 main.player.setCurrentPosition(i+1);
        	 l.setPosition(main.player.getCurrentPosition());
@@ -120,58 +118,23 @@ public class OfflinePanel extends JPanel{
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-   	 }*/
-		
-		turns(main.player);	
-		
-		play.setEnabled(false);
-        int delay = 2000; //milliseconds
-        ActionListener taskPerformer = new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-        		turns(pc);
-        		play.setEnabled(true);
-            }
-        };
-        
-       Timer timer =  new Timer(delay, taskPerformer);
-       timer.setRepeats(false);
-       timer.start();
-		
-	}
-	
- 
-	void startTurns()
-	{
-		String start =  " Will start The Game\n";
-		int rolledDice = dice.getRandomNoAnimation(1,2);
-		System.out.println(rolledDice);
-		if(rolledDice == 1)
-		{
-	   	   area.append(main.player.getName() + start);
-	   	   playerLabel.setText(main.player.getName() + " Turn");
-	   	   firstTime = false;
-		}
-		else
-		{
-	   	    area.append(pc.getName() + start);
-	   	    turns(pc);
-		}
+   	 }
+		*/
+		played = true;
+		autoTurns();
 	}
 	
 	void turns(Player player)
 	{
 		int rolledDice = 0;
 		
-		if(firstTime)
-			rolledDice = dice.getRandomNoAnimation(1,6);
-		else
-			 rolledDice = dice.getFinalRandom(1,6);
+		rolledDice = dice.getFinalRandom(1,6);
 		
 		//condition if the current position is 100
 		
 	   player.setPreviousPosition(player.getCurrentPosition());
 	   player.setCurrentPosition(player.getCurrentPosition() + rolledDice);
-	   
+
 		if(laddersAndSnakes.get(player.getCurrentPosition()) != null)
 		{
 			 player.setCurrentPosition(laddersAndSnakes.get(player.getCurrentPosition())) ;
@@ -181,11 +144,78 @@ public class OfflinePanel extends JPanel{
 	   player.setPosition(l.getFinalPosition());
 	   System.out.println(player.getName()+" : "+ Arrays.toString(player.getPosition()) + " " + player.getCurrentPosition());
 	   
-	   playerLabel.setText(player.getName() + " Turn");
 	   area.append(player.getName() + " Played "+rolledDice+"\n");
   	   area.setPreferredSize(new Dimension(250,area.getPreferredSize().height+20));
   	   
   	   repaint();
-	   firstTime = false;
 	}
+	
+	void autoTurns()
+	{
+		//assign current player
+		Player currentPlayer = activePlayers.get(currenPlayerNumber);
+		//set the player label text that has the turn
+		playerLabel.setText(currentPlayer.getName() + " Turn");
+		//make the current player active
+		currentPlayer.setActive(true);
+		//make the play button disable
+		play.setEnabled(false);
+		//if current player is pc and active
+        if(currentPlayer.isPc() && currentPlayer.isActive())
+        {
+        	//delay for the animation
+            int delay = 2000; //milliseconds
+            ActionListener taskPerformer = new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                	//get the dice and turns of the current pc 
+                	turns(currentPlayer);
+                	//increase the currentPlayerNumber to get it at line 156
+       		        increaseCurrentPlayerNumber();
+       		        //set the current player activity to false
+    				currentPlayer.setActive(false);
+    				//call the method again
+    				autoTurns();
+                }
+            };
+            //the timer
+           Timer timer =  new Timer(delay, taskPerformer);
+           timer.setRepeats(false);
+           timer.start();
+          }
+        else if(!currentPlayer.isPc() && currentPlayer.isActive())
+        {
+        	//if is the user set the button to true
+    		play.setEnabled(true);
+    		//waiting the user to play make true at line 123 if the user playes
+			if(played == true)
+			{
+		        increaseCurrentPlayerNumber();
+				currentPlayer.setActive(false);	
+				//set the buuton to disable again after playing
+	    		play.setEnabled(false);
+	    		turns(currentPlayer);
+	            played = false;
+	            autoTurns();
+			}
+
+        }	 
+	}
+	
+	void increaseCurrentPlayerNumber()
+	{
+        if(currenPlayerNumber == activePlayers.size()-1)
+        {
+        	currenPlayerNumber = 0;
+        }
+        else
+        {
+            currenPlayerNumber++;
+        }
+	}
+	
+	void setActivePlayers(List<Player> activePlayers)
+	{
+		this.activePlayers = activePlayers;
+	}
+
 }

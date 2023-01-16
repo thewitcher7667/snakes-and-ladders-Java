@@ -11,6 +11,8 @@ public class Player implements Serializable{
 	private int currentPosition;
 	private int previousPosition;
 	private Color color;
+	private boolean active;
+	private boolean isPc;
     private static final long serialVersionUID = 6529685098267757690L;
 	
 	Player()
@@ -18,8 +20,10 @@ public class Player implements Serializable{
 		setPosition(new int[] {-50,-50});
 		setCurrentPosition(0);
 		setPreviousPosition(0);
+		setActive(false);
 		setName("Player");
 		setColor(Color.WHITE);
+		setPc(false);
 	}
 	
 	Player(String name,Color color)
@@ -27,8 +31,20 @@ public class Player implements Serializable{
 		setPosition(new int[] {0,0});
 		setCurrentPosition(0);
 		setPreviousPosition(0);
+		setActive(false);
 		setName(name);
 		setColor(color);
+		setPc(false);
+	}
+	
+	Player(String name,boolean isPc)
+	{
+		setPosition(new int[] {0,0});
+		setCurrentPosition(0);
+		setPreviousPosition(0);
+		setName(name);
+		setActive(false);
+		this.setPc(isPc);
 	}
 
 	public String getName() {
@@ -77,6 +93,22 @@ public class Player implements Serializable{
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public boolean isPc() {
+		return isPc;
+	}
+
+	public void setPc(boolean isPc) {
+		this.isPc = isPc;
 	}
 
 }
