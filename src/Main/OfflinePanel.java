@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -35,6 +36,13 @@ public class OfflinePanel extends JPanel{
 	 int currenPlayerNumber =0;
 	 List<Player> activePlayers;
 	 boolean played;
+	 int autoTurnsDelay;
+	 
+	 //back button
+	 JButton backButt;
+	 //winner label
+	 JLabel winnerLabel;
+	 //play againg button
 	 
 	    //ladders
 	    public static final Map<Integer,Integer> laddersAndSnakes;
@@ -48,8 +56,8 @@ public class OfflinePanel extends JPanel{
 	        tmp.put(21,42);
 	        tmp.put(28,76);
 	        tmp.put(50,67);
-	        tmp.put(73,92);
-	        tmp.put(86,99);
+	        tmp.put(71,92);
+	        tmp.put(80,99);
 	        //snakes
 	        tmp.put(32,10);
 	        tmp.put(36,6);
@@ -65,6 +73,7 @@ public class OfflinePanel extends JPanel{
      {
     	 l = new Logic();
     	 played = false;
+    	 autoTurnsDelay = 2000;
     	 
     	 this.setLayout(new BorderLayout());
     	 
@@ -72,6 +81,9 @@ public class OfflinePanel extends JPanel{
     	 notBoardPanel = new JPanel();
     	 dice = new Dice();
     	 playerLabel = new JLabel();
+    	 
+    	 backButt = new JButton("Back");
+         //style.buttons(backButt, Color.decode("#FF4E33"), 10, 50, 10, 50);
     	 
          style.labels(playerLabel, 15, Color.decode("#FFB756"));
     	 
@@ -98,6 +110,7 @@ public class OfflinePanel extends JPanel{
     	 notBoardPanel.add(s);
     	 notBoardPanel.add(dice);
     	 notBoardPanel.add(play);
+    	 notBoardPanel.add(backButt);
 
     	 add(notBoardPanel,BorderLayout.EAST);
 
@@ -106,7 +119,7 @@ public class OfflinePanel extends JPanel{
 	public void playActionPerformed()
 	{	
 	//test case for all positions	
-   /*	 for(int i =0;i<=100;i++)
+   	 /*for(int i =0;i<=100;i++)
    	 {
        	 main.player.setCurrentPosition(i+1);
        	 l.setPosition(main.player.getCurrentPosition());
@@ -114,12 +127,12 @@ public class OfflinePanel extends JPanel{
        	 board.paint(board.getGraphics());
        	 
        	 try {
-				Thread.sleep(500);
+				Thread.sleep(300);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-   	 }
-		*/
+   	 }*/
+		
 		played = true;
 		autoTurns();
 	}
@@ -134,20 +147,84 @@ public class OfflinePanel extends JPanel{
 		
 	   player.setPreviousPosition(player.getCurrentPosition());
 	   player.setCurrentPosition(player.getCurrentPosition() + rolledDice);
-
-		if(laddersAndSnakes.get(player.getCurrentPosition()) != null)
-		{
-			 player.setCurrentPosition(laddersAndSnakes.get(player.getCurrentPosition())) ;
-		}
-	   
-	   l.setPosition(player.getCurrentPosition());
-	   player.setPosition(l.getFinalPosition());
-	   System.out.println(player.getName()+" : "+ Arrays.toString(player.getPosition()) + " " + player.getCurrentPosition());
 	   
 	   area.append(player.getName() + " Played "+rolledDice+"\n");
-  	   area.setPreferredSize(new Dimension(250,area.getPreferredSize().height+20));
-  	   
+	   area.setPreferredSize(new Dimension(250,area.getPreferredSize().height+20));
+	   
+	   animation(player); 
+		   
+	   System.out.println(player.getName()+" : "+ Arrays.toString(player.getPosition()) + " " + player.getCurrentPosition() );
+
+	   
   	   repaint();
+	}
+	
+	void animation(Player player)
+	{
+      int delay = 300; //milliseconds
+       autoTurnsDelay = delay * (player.getCurrentPosition() - player.getPreviousPosition()) + 2000;
+   	 ActionListener taskPerformer = new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+     		if(player.getPreviousPosition() >= player.getCurrentPosition()+1)
+     		{
+     			if(laddersAndSnakes.get(player.getCurrentPosition()) != null)
+     			{
+     				 player.setCurrentPosition(laddersAndSnakes.get(player.getCurrentPosition())) ;
+     	         	 l.setPosition(player.getCurrentPosition());
+     	        	 player.setPosition(l.getFinalPosition());
+     	           	 player.setPreviousPosition(player.getCurrentPosition());
+     	           	 repaint();
+     			}
+     			if(player.isWinner())
+     			{
+     				isWinnerOptionPane(player.getName());
+     			}
+     			return;
+     		}
+     		else if(checkWinner(player))
+     		{
+           	   l.setPosition(player.getPreviousPosition());
+         	   player.setPosition(l.getFinalPosition());
+               player.setPreviousPosition(player.getPreviousPosition()+1);
+               repaint();
+               animation(player);	
+     		}
+         }
+     };
+     //the timer
+     Timer timer =  new Timer(delay, taskPerformer);
+     timer.setRepeats(false);
+     timer.start();	
+	}
+	
+	boolean checkWinner(Player player)
+	{
+		if(player.getCurrentPosition() == 100) {
+            player.setWinner(true);
+            return true;
+        }
+        else if(player.getCurrentPosition() > 100) {
+            player.setCurrentPosition(player.getPreviousPosition());
+            return false;
+        }
+	   return true;
+	}
+	
+	void isWinnerOptionPane(String name)
+	{
+        Object[] options1 = { "Play Again", "Back"};
+        int result = JOptionPane.showOptionDialog(null, name + " Is The Winner", "Winner",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options1, null);
+        
+        if (result == JOptionPane.YES_OPTION)
+        {
+        	//play again option
+        }
+        else if(result  == JOptionPane.NO_OPTION)
+        {
+        	
+        }
 	}
 	
 	void autoTurns()
@@ -164,7 +241,7 @@ public class OfflinePanel extends JPanel{
         if(currentPlayer.isPc() && currentPlayer.isActive())
         {
         	//delay for the animation
-            int delay = 2000; //milliseconds
+            int delay = autoTurnsDelay; //milliseconds
             ActionListener taskPerformer = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                 	//get the dice and turns of the current pc 
@@ -190,11 +267,12 @@ public class OfflinePanel extends JPanel{
 			if(played == true)
 			{
 		        increaseCurrentPlayerNumber();
-				currentPlayer.setActive(false);	
 				//set the buuton to disable again after playing
 	    		play.setEnabled(false);
 	    		turns(currentPlayer);
 	            played = false;
+	            
+				currentPlayer.setActive(false);	
 	            autoTurns();
 			}
 

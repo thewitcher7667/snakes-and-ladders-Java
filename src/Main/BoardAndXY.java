@@ -1,6 +1,7 @@
 package Main;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -15,6 +16,7 @@ public class BoardAndXY extends JPanel{
 	Style style;
     Image board ;
     private List<Player> players;
+    int ovalSize;
     
 	BoardAndXY(List<Player> players)
 	{
@@ -22,6 +24,7 @@ public class BoardAndXY extends JPanel{
    	    style = new Style();
    	    style.panels(this, Color.decode("#00023F"), 617, 610);
    	    board = new ImageIcon("game.png").getImage();
+   	    ovalSize = 40;
 	}
 	
     @Override
@@ -35,9 +38,12 @@ public class BoardAndXY extends JPanel{
    	 
    	 for(int i =0 ;i<players.size();i++)
    	 {
-   	   	 d.drawOval(players.get(i).getPosition()[0], players.get(i).getPosition()[1], 40, 40);
+   	   	 d.drawOval(players.get(i).getPosition()[0], players.get(i).getPosition()[1], ovalSize, ovalSize);
    	   	 d.setColor(players.get(i).getColor());
-   	   	 d.fillOval(players.get(i).getPosition()[0], players.get(i).getPosition()[1], 40, 40);
+   	   	 d.fillOval(players.get(i).getPosition()[0], players.get(i).getPosition()[1], ovalSize, ovalSize);
+   	   	 d.setColor(Color.BLACK);
+   	   	 d.setFont(new Font("default", Font.BOLD, 16));
+   	   	 d.drawString(players.get(i).getName(), players.get(i).getPosition()[0], players.get(i).getPosition()[1]);
    	  }
 }
     

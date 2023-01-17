@@ -13,6 +13,7 @@ public class Player implements Serializable{
 	private Color color;
 	private boolean active;
 	private boolean isPc;
+	private boolean isWinner;
     private static final long serialVersionUID = 6529685098267757690L;
 	
 	Player()
@@ -24,6 +25,7 @@ public class Player implements Serializable{
 		setName("Player");
 		setColor(Color.WHITE);
 		setPc(false);
+		setWinner(false);
 	}
 	
 	Player(String name,Color color)
@@ -35,6 +37,7 @@ public class Player implements Serializable{
 		setName(name);
 		setColor(color);
 		setPc(false);
+		setWinner(false);
 	}
 	
 	Player(String name,boolean isPc)
@@ -45,6 +48,7 @@ public class Player implements Serializable{
 		setName(name);
 		setActive(false);
 		this.setPc(isPc);
+		setWinner(false);
 	}
 
 	public String getName() {
@@ -109,6 +113,14 @@ public class Player implements Serializable{
 
 	public void setPc(boolean isPc) {
 		this.isPc = isPc;
+	}
+
+	public boolean isWinner() {
+		return isWinner;
+	}
+
+	public void setWinner(boolean isWinner) {
+		this.isWinner = isWinner;
 	}
 
 }
