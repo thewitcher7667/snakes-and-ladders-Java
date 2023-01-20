@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
+import Online.OnlinePanel;
 
 @SuppressWarnings("serial")
 public class OfflinePanel extends JPanel{
@@ -34,16 +41,27 @@ public class OfflinePanel extends JPanel{
 	 Logic l ;
 	 int oneHundredPorition =0 ;
 	 int currenPlayerNumber =0;
-	 List<Player> activePlayers;
+	 public static List<Player> activePlayers;
 	 boolean played;
-	 int autoTurnsDelay;
-	 
+	 int autoTurnsDelay; 
 	 //back button
 	 JButton backButt;
-	 //winner label
-	 JLabel winnerLabel;
-	 //play againg button
-	 
+	 boolean anyWinner;
+	 boolean online;
+	    public static final Map<String,Color> ColorsHashMap;
+	    static{
+	        Hashtable<String,Color> tmp = 
+	            new Hashtable<String,Color>();
+	        //ladders
+	        tmp.put("Orange",Color.ORANGE);
+	        tmp.put("Red",Color.RED);
+	        tmp.put("Blue",Color.BLUE);
+	        tmp.put("Green",Color.GREEN);
+	        tmp.put("Black",Color.BLACK);
+	        tmp.put("Yellow",Color.YELLOW);
+	        tmp.put("White",Color.WHITE);
+	        ColorsHashMap = Collections.unmodifiableMap(tmp);
+	    }
 	    //ladders
 	    public static final Map<Integer,Integer> laddersAndSnakes;
 	    static{
@@ -68,11 +86,15 @@ public class OfflinePanel extends JPanel{
 	        tmp.put(97,78);
 	        laddersAndSnakes = Collections.unmodifiableMap(tmp);
 	    }
+	    
      
-     OfflinePanel()
+     OfflinePanel(boolean online)
      {
+    	 this.online = online;
+    	 activePlayers = new LinkedList<Player>();
     	 l = new Logic();
     	 played = false;
+    	 anyWinner = false;
     	 autoTurnsDelay = 2000;
     	 
     	 this.setLayout(new BorderLayout());
@@ -83,7 +105,8 @@ public class OfflinePanel extends JPanel{
     	 playerLabel = new JLabel();
     	 
     	 backButt = new JButton("Back");
-         //style.buttons(backButt, Color.decode("#FF4E33"), 10, 50, 10, 50);
+         style.buttons(backButt, Color.decode("#FF4E33"), 10, 50, 10, 50);
+         backButt.addActionListener(e -> backButton());
     	 
          style.labels(playerLabel, 15, Color.decode("#FFB756"));
     	 
@@ -148,8 +171,7 @@ public class OfflinePanel extends JPanel{
 	   player.setPreviousPosition(player.getCurrentPosition());
 	   player.setCurrentPosition(player.getCurrentPosition() + rolledDice);
 	   
-	   area.append(player.getName() + " Played "+rolledDice+"\n");
-	   area.setPreferredSize(new Dimension(250,area.getPreferredSize().height+20));
+	   addText(player.getName() + " Played "+rolledDice);
 	   
 	   animation(player); 
 		   
@@ -175,9 +197,14 @@ public class OfflinePanel extends JPanel{
      	           	 player.setPreviousPosition(player.getCurrentPosition());
      	           	 repaint();
      			}
+     			if(online)
+     			{
+               	    updateOnline();
+     			}
      			if(player.isWinner())
      			{
      				isWinnerOptionPane(player.getName());
+     				resetGame();
      			}
      			return;
      		}
@@ -188,7 +215,12 @@ public class OfflinePanel extends JPanel{
                player.setPreviousPosition(player.getPreviousPosition()+1);
                repaint();
                animation(player);	
+               return;
      		}
+ 			if(online)
+ 			{
+           	    updateOnline();
+ 			}
          }
      };
      //the timer
@@ -197,10 +229,23 @@ public class OfflinePanel extends JPanel{
      timer.start();	
 	}
 	
+	void updateOnline()
+	{
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        try {
+			String json = ow.writeValueAsString(activePlayers);
+			json  = "[\n"+json+","+currenPlayerNumber+"\n]";
+			OnlinePanel.s.emit("ActivePlayers", json);
+		} catch (JsonProcessingException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
 	boolean checkWinner(Player player)
 	{
 		if(player.getCurrentPosition() == 100) {
             player.setWinner(true);
+			anyWinner = true;
             return true;
         }
         else if(player.getCurrentPosition() > 100) {
@@ -219,12 +264,17 @@ public class OfflinePanel extends JPanel{
         
         if (result == JOptionPane.YES_OPTION)
         {
-        	//play again option
+        	resetGame();
+        	main.frame.setContentPane(new TurnsAndPlayers(true,false));
         }
         else if(result  == JOptionPane.NO_OPTION)
         {
+        	//back function 
+        	resetGame();
+        	main.frame.setContentPane(new MainPanel());
         	
         }
+        disconnectOnline();
 	}
 	
 	void autoTurns()
@@ -238,7 +288,7 @@ public class OfflinePanel extends JPanel{
 		//make the play button disable
 		play.setEnabled(false);
 		//if current player is pc and active
-        if(currentPlayer.isPc() && currentPlayer.isActive())
+        if(currentPlayer.isPc() && currentPlayer.isActive() && !anyWinner)
         {
         	//delay for the animation
             int delay = autoTurnsDelay; //milliseconds
@@ -259,24 +309,46 @@ public class OfflinePanel extends JPanel{
            timer.setRepeats(false);
            timer.start();
           }
-        else if(!currentPlayer.isPc() && currentPlayer.isActive())
+        else if(!currentPlayer.isPc() && currentPlayer.isActive() && !anyWinner)
         {
-        	//if is the user set the button to true
-    		play.setEnabled(true);
     		//waiting the user to play make true at line 123 if the user playes
-			if(played == true)
+			if(main.player.getId() == currentPlayer.getId())
 			{
-		        increaseCurrentPlayerNumber();
-				//set the buuton to disable again after playing
-	    		play.setEnabled(false);
-	    		turns(currentPlayer);
-	            played = false;
-	            
-				currentPlayer.setActive(false);	
-	            autoTurns();
+	        	//if is the user set the button to true
+	    		play.setEnabled(true);
+			   if(played == true)
+			    {
+			        increaseCurrentPlayerNumber();
+					//set the buuton to disable again after playing
+		    		play.setEnabled(false);
+		    		turns(currentPlayer);
+		            played = false;
+					currentPlayer.setActive(false);	
+		            autoTurns();	
+				}
 			}
 
         }	 
+	}
+	
+	void resetGame()
+	{
+		for(int i = 0;i<activePlayers.size();i++)
+		{
+			Player current = activePlayers.get(i);
+			current.setCurrentPosition(0);
+			current.setPreviousPosition(0);
+			current.setWinner(false);
+			current.setActive(false);
+			current.setPosition(new int[] {-50,-50});
+		}
+	}
+	
+	void backButton()
+	{
+		resetGame();
+		disconnectOnline();
+		main.frame.setContentPane(new MainPanel());
 	}
 	
 	void increaseCurrentPlayerNumber()
@@ -293,7 +365,29 @@ public class OfflinePanel extends JPanel{
 	
 	void setActivePlayers(List<Player> activePlayers)
 	{
-		this.activePlayers = activePlayers;
+		OfflinePanel.activePlayers = activePlayers;
 	}
-
+	
+	void addText(String text)
+	{
+		if(online)
+		{
+			OnlinePanel.s.emit("Messges",text);	
+		}
+		else
+		{
+			area.append(text);
+		}
+		   area.setPreferredSize(new Dimension(250,area.getPreferredSize().height+30));
+	}
+	
+	void disconnectOnline()
+	{
+		if(online)
+		{
+			OnlinePanel.s.disconnect();
+			OnlinePanel.s.close();
+		}
+	}
+	
 }

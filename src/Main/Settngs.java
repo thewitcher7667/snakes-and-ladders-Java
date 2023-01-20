@@ -48,6 +48,5 @@ public class Settngs extends JOptionPane {
 		{
 			main.player.setName(field1.getText());
 		}
-		main.savePlayer(main.player);
 	}
 }

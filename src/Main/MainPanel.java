@@ -7,6 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import Online.OnlinePanel;
+
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel{
      private JLabel label;
@@ -15,7 +17,7 @@ public class MainPanel extends JPanel{
      private JButton setting;
      private Style style;
      
-     MainPanel()
+     public MainPanel()
      {
     	 this.setLayout(new FlowLayout(FlowLayout.CENTER,900,100));
     	 label = new JLabel("Snakes and Ladders",JLabel.CENTER);
@@ -32,6 +34,7 @@ public class MainPanel extends JPanel{
    	     offline.addActionListener(e -> offlineButtonAction());
    	     
    	     style.buttons(online, Color.decode("#FF4E33"), 10, 50, 10, 50);
+   	     online.addActionListener(e -> onlineButtonAction());
    	     
    	     style.buttons(setting, Color.decode("#FF4E33"), 10, 50, 10, 50);
    	     setting.addActionListener(e -> settingButtonAction());
@@ -50,11 +53,16 @@ public class MainPanel extends JPanel{
      
      private void offlineButtonAction()
      {
-    	 main.frame.setContentPane(new TurnsAndPlayers());
+    	 main.frame.setContentPane(new TurnsAndPlayers(false,false));
      }
      
      private void settingButtonAction()
      {
     	 new Settngs();
+     }
+     
+     private void onlineButtonAction()
+     {
+    	 main.frame.setContentPane(new OnlinePanel());
      }
 }

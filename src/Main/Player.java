@@ -3,17 +3,22 @@ package Main;
 import java.awt.Color;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 public class Player implements Serializable{
 
 	private int id;
 	private String name;
+	@JsonProperty("position")
 	private int[] position;
 	private int currentPosition;
 	private int previousPosition;
-	private Color color;
+	private String color;
 	private boolean active;
 	private boolean isPc;
 	private boolean isWinner;
+	private String party;
     private static final long serialVersionUID = 6529685098267757690L;
 	
 	Player()
@@ -23,34 +28,35 @@ public class Player implements Serializable{
 		setPreviousPosition(0);
 		setActive(false);
 		setName("Player");
-		setColor(Color.WHITE);
+		setColor("White");
 		setPc(false);
 		setWinner(false);
 	}
 	
 	Player(String name,Color color)
 	{
-		setPosition(new int[] {0,0});
+		setPosition(new int[] {-50,-50});
 		setCurrentPosition(0);
 		setPreviousPosition(0);
 		setActive(false);
 		setName(name);
-		setColor(color);
+		setColor("White");
 		setPc(false);
 		setWinner(false);
 	}
 	
 	Player(String name,boolean isPc)
 	{
-		setPosition(new int[] {0,0});
+		setPosition(new int[] {-50,-50});
 		setCurrentPosition(0);
 		setPreviousPosition(0);
 		setName(name);
 		setActive(false);
-		this.setPc(isPc);
+		setColor("White");
+		setPc(isPc);
 		setWinner(false);
 	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -59,11 +65,11 @@ public class Player implements Serializable{
 		this.name = name;
 	}
 
-	public Color getColor() {
+	public String getColor() {
 		return color;
 	}
 
-	public void setColor(Color color) {
+	public void setColor(String color) {
 		this.color = color;
 	}
 
@@ -121,6 +127,14 @@ public class Player implements Serializable{
 
 	public void setWinner(boolean isWinner) {
 		this.isWinner = isWinner;
+	}
+
+	public String getParty() {
+		return party;
+	}
+
+	public void setParty(String party) {
+		this.party = party;
 	}
 
 }
