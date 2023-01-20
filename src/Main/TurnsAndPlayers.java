@@ -187,7 +187,7 @@ public class TurnsAndPlayers extends OfflinePanel{
 		}
 		else
 		{
-			addText("Waiting Players\n");
+			addText("Waiting Players");
 		}
 	}
 

@@ -376,7 +376,7 @@ public class OfflinePanel extends JPanel{
 		}
 		else
 		{
-			area.append(text);
+			area.append(text+"\n");
 		}
 		   area.setPreferredSize(new Dimension(250,area.getPreferredSize().height+30));
 	}
