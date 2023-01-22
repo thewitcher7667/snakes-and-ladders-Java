@@ -1,12 +1,11 @@
 package Main;
 
 import java.awt.Color;
-import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-public class Player implements Serializable{
+public class Player {
 
 	private int id;
 	private String name;
@@ -19,7 +18,6 @@ public class Player implements Serializable{
 	private boolean isPc;
 	private boolean isWinner;
 	private String party;
-    private static final long serialVersionUID = 6529685098267757690L;
 	
 	Player()
 	{

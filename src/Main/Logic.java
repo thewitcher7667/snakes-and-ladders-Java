@@ -1,7 +1,5 @@
 package Main;
 
-import java.util.Arrays;
-
 public class Logic {
 
 	private int position;

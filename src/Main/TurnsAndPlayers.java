@@ -131,6 +131,8 @@ public class TurnsAndPlayers extends OfflinePanel{
 			}
 		});	
 		sizes();
+   	    board = new BoardAndXY();
+   	    add(board,BorderLayout.WEST);	
 	}
 	
 	void sizes()
@@ -163,8 +165,6 @@ public class TurnsAndPlayers extends OfflinePanel{
 				   	    setActivePlayers(players);
 				   	    if(isFirstTime())
 				   	    {
-					   	    board = new BoardAndXY();
-					   	    add(board,BorderLayout.WEST);	
 					   	    area.append("Game Started\n");
 				   	    }
 				   	  repaint();

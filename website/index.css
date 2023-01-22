@@ -1,0 +1,75 @@
+*{
+    margin: 0px;
+    padding:0px;
+    overflow-x: hidden;
+}
+
+body{
+    background-color: #00023F;
+    margin:20px;
+}
+
+h2{
+    color:#FFB756;
+    font-size: 40px;
+    text-align: center;
+}
+
+button{
+    border: 2px white solid;
+    border-radius: 10%;
+    font-size: 20px;
+    margin: 20px;
+    padding:10px 30px 10px 30px ;
+    color: aliceblue;
+    background-color: #FF4E33;
+}
+
+button:hover{
+    color: #FF4E33;
+    background-color: aliceblue;
+    border: 2px #FF4E33 solid;
+    cursor: pointer;
+}
+
+div{
+    margin-bottom: 20px;
+}
+
+section div{
+    text-align: center;
+}
+
+.innerSetting{
+    text-align:center;
+    background-color:rgba(0,0,0, 0.4);
+    color:bisque;
+    height:fit-content;
+    z-index:1px;
+    width:60%;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top: 100px;
+    padding: 40px 10% 40px 10%;    
+}
+
+.outerSetting{
+    position:absolute;
+    background: rgb(255, 255, 255, 0.1);
+    background-blend-mode: normal;
+    backdrop-filter: blur(5px);
+    height: 100%;
+    width: 100%;
+    margin-left:auto;
+    margin-right:auto;
+    top:0%;
+    font-size: 20px;
+}
+
+input{
+    height: 20px;
+}
+
+@media only screen and (min-width: 250px) and (max-width: 450px){
+
+}

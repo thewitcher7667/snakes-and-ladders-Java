@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
+app.use(express.static('website'));
 const http = require("http");
-//const { Socket } = require("socket.io");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 const port = 3000;
@@ -15,7 +15,7 @@ let parties = {
 };
 
 app.get("/",(req,res)=>{
-    res.send(parties);
+    res.render(index);
 })
 
 io.on("connection",(Socket)=>{

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="Stylesheet" href="index.css">
+    <script defer src="Player.js"></script>
+    <script defer src="logic.js"></script>
+    <script defer src="index.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Snakes And Ladders</title>
+</head>
+<body>
+    <div>
+        <h2>
+            Snakes And Ladders
+        </h2>
+    </div>
+    <section id="firstPanel">
+        <div>
+           <button id="offlineButt">Offline</button> 
+        </div>
+        <div>
+            <button>Online</button> 
+         </div>
+         <div>
+            <button id="settingButt">Setting</button> 
+         </div>
+    </section>
+
+    <section id="ofllineGame" style="display:none;" >
+        <div id="canvasesDiv" style="position:relative;text-align: left;"> 
+            <canvas id="canvas" style="position:absolute;" >
+
+            </canvas>
+            <canvas id="circles" style="position:absolute;">
+
+            </canvas>
+        </div>
+        <div>
+            <p id="area" style="width:200px;height:300px;"></p>
+            <canvas id="dice" >
+            </canvas>
+            <button id="play">Play</button>
+        </div>
+    </section>
+
+    <div id="settingDiv" class="outerSetting" style="display:none;">
+        <div class="innerSetting">
+            <label for="nameSetting">Enter Your Name : </label>
+            <input id="nameSetting" type="text" name="nameSetting" placeholder="your name">
+            <label id="errorSetting" style="color:red;"></label>
+            <br/>
+            <button id="applySetting">Apply</button>
+            <button id="closeSetting">Close</button>
+        </div>
+    </div>
+
+    <div id="OfflineDiv" class="outerSetting" style="display:none;">
+        <div class="innerSetting">
+            <label for="playerNumber">Enter player Number : </label>
+            <select id="playerNumber">
+                <option>
+                    2
+                </option>
+                <option>
+                    3
+                </option>
+                <option>
+                    4
+                </option>
+                <option>
+                    5
+                </option>
+                <option>
+                    6
+                </option>
+            </select>
+            <br/>
+            <label for="playerColor">choose your color : </label>
+            <select id="playerColor">
+                <option>
+                    Orange
+                </option>
+                <option>
+                    Red
+                </option>
+                <option>
+                    Blue
+                </option>
+                <option>
+                    Green
+                </option>
+                <option>
+                    Black
+                </option>
+                <option>
+                    Yellow
+                </option>
+            </select>
+            <br/>
+            <button id="applyOffline">Apply</button>
+            <button id="closeOffline">Close</button>
+        </div>
+    </div>
+
+</body>
+</html>
