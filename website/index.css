@@ -32,6 +32,11 @@ button:hover{
     cursor: pointer;
 }
 
+button:disabled,
+button[disabled]{
+  color: #666666;
+}
+
 div{
     margin-bottom: 20px;
 }
@@ -70,6 +75,33 @@ input{
     height: 20px;
 }
 
-@media only screen and (min-width: 250px) and (max-width: 450px){
-
+#ofllineGame{
+    display: flex;
+    flex-direction: column;
 }
+
+.secondDivOfflineGame{
+    display: flex; 
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+@media only screen and (min-width: 845px) {
+    #ofllineGame{
+        display: flex;
+        flex-direction: row;
+    }
+
+    .secondDivOfflineGame{
+        display: flex; 
+        flex-direction: column;
+        align-items: center;
+    }
+} 
+
+@media only screen and (min-width: 250px) and (max-width:500px) {
+    .secondDivOfflineGame{
+        flex-direction: column;
+        align-items: center;
+    }
+} 

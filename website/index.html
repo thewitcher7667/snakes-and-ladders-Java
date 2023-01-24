@@ -17,16 +17,30 @@
             Snakes And Ladders
         </h2>
     </div>
-    <section id="firstPanel">
+    <section id="firstPanel" >
         <div>
            <button id="offlineButt">Offline</button> 
         </div>
         <div>
-            <button>Online</button> 
+            <button id="onlineButt">Online</button> 
          </div>
          <div>
             <button id="settingButt">Setting</button> 
          </div>
+    </section>
+
+    <section id="online" style="display:none;">
+        <div id="creatPartyDiv">
+            <button id="creatPartyButt">Create Party</button>
+            <input id="creatPartyTxt" type="text" placeholder="Party Name">
+        </div>
+        <div>
+            <button id="joinPartyButt">Join Party</button>
+            <input id="joinPartyTxt" type="text" placeholder="Party Name">  
+        </div>
+        <div>
+            <button id="backOnline">Back</button>
+        </div>
     </section>
 
     <section id="ofllineGame" style="display:none;" >
@@ -38,11 +52,14 @@
 
             </canvas>
         </div>
-        <div>
-            <p id="area" style="width:200px;height:300px;"></p>
-            <canvas id="dice" >
+        <div class="secondDivOfflineGame">
+            <h4 id="turnH2" style="color:white;"></h4>
+            <br/>
+            <canvas id="dice"  >
             </canvas>
             <button id="play">Play</button>
+            <button id="backButtMain">Back</button>
+            <p id="area" style="width:200px;height:300px;color:beige;" ></p>
         </div>
     </section>
 
@@ -102,6 +119,16 @@
             <br/>
             <button id="applyOffline">Apply</button>
             <button id="closeOffline">Close</button>
+        </div>
+    </div>
+
+    <div id="winnerDiv" class="outerSetting" style="display:none;">
+        <div class="innerSetting">
+              <h3 id="winnerH3">
+
+              </h3>
+              <button id="PlayAgainButt">Play again</button>
+              <button id="backButt">Back</button>
         </div>
     </div>
 

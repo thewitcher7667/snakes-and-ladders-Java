@@ -20,14 +20,26 @@ let play = document.getElementById("play");
 let area = document.getElementById("area");
 let ofllineGame = document.getElementById("ofllineGame");
 let firstPanel = document.getElementById("firstPanel");
+let winnerDiv = document.getElementById("winnerDiv");
+let winnerH3 = document.getElementById("winnerH3");
+let backButtMain = document.getElementById("backButtMain");
+let backButt = document.getElementById("backButt");
+let PlayAgainButt = document.getElementById("PlayAgainButt");
+let onlineButt = document.getElementById("onlineButt");
+let online = document.getElementById("online");
+let backOnline = document.getElementById("backOnline");
+let turnH2 = document.getElementById("turnH2");
 
 let player = new Player("player",false);
+player.setId(random(100000,0));
 let colors = ["Orange","Red","Blue","Green","Black","Yellow"]
 let comps = [new Player("pc1",true),new Player("pc2",true),new Player("pc3",true),new Player("pc4",true),new Player("pc5",true)]
 let activePlayers = [];
 let logic;
 let currenPlayerNumber;
 let played = false;
+let anyWinner = false;
+let autoTurnsDelay = 2000;
 let snakesAndLadders = {
     1:38,
     4:14,
@@ -46,6 +58,17 @@ let snakesAndLadders = {
     95:56,
     97:78,
 }
+
+
+onlineButt.addEventListener("click",()=>{
+    firstPanel.style.display = "none"
+    online.style.display = "block";
+})
+
+backOnline.addEventListener("click",()=>{
+    online.style.display = "none";
+    firstPanel.style.display = "block"
+})
 
 settingButt.addEventListener("click", ()=>{
     settingDiv.style.display = "block";
@@ -75,8 +98,29 @@ closeOffline.addEventListener("click", ()=>{
     OfflineDiv.style.display = "none";
 });
 
+backButtMain.addEventListener("click",()=>{
+    back();
+})
+
+backButt.addEventListener("click",()=>{
+    winnerDiv.style.display = "none";
+    back();
+})
+
+function back()
+{
+    resetGame();
+    firstPanel.style.display = "block";
+    ofllineGame.style.display = "none";
+}
+
+PlayAgainButt.addEventListener("click", ()=>{
+    winnerDiv.style.display = "none";
+    OfflineDiv.style.display = "block";
+})
+
 applyOffline.addEventListener("click",()=>{
-    activePlayers = [];
+    resetGame();
     activePlayers.push(player);
     player.setColor(colors[playerColor.selectedIndex]);
     colors.splice(playerColor.selectedIndex,1);
@@ -90,8 +134,9 @@ applyOffline.addEventListener("click",()=>{
     activePlayers = shuffle(activePlayers);
     OfflineDiv.style.display = "none";
     firstPanel.style.display = "none";
-    ofllineGame.style.display = "block";
+    ofllineGame.style.display = "flex";
     currenPlayerNumber = 0;
+    drawDice(0);
     getWindowSize();
     autoTurns();
 })
@@ -101,7 +146,6 @@ play.addEventListener("click",async ()=>{
     autoTurns();
 })
 
-drawDice(0);
 function drawDice(rand)
 {
     dice.width = 100;
@@ -120,7 +164,7 @@ async function diceRandom()
     let rand = 0;
    for(let i=0;i<4;i++)
    {
-    rand = random(1,6);
+    rand = random(0,7);
     drawDice(rand);
     await sleep(500);
    }
@@ -187,57 +231,97 @@ function drawPlayers(width)
 
 async function turns(player)
 {
+    if(checkIfEmpty(player))
+    {
+      return;
+    }
     let rand = await diceRandom();
     player.setPreviousPosition(player.getCurrentPosition());
     player.setCurrentPosition(player.getCurrentPosition()+rand);
 
-    logic.setPosition(player.getCurrentPosition());
-    player.setPosition(await logic.getFinalPosition())
-
-    area.innerText += player.getName() + "Played" + rand + "\n";
+    area.innerText += player.getName() + " : Played " + rand + "\n";
     animation(player)
 }
 
 async function animation(player)
 {
-      if(player.getPreviousPosition() >= player.getCurrentPosition())
+    if(checkIfEmpty(player))
+    {
+      return;
+    }
+    autoTurnsDelay = 300 * (player.getCurrentPosition() - player.getPreviousPosition()) + 2000;
+    if(player.getPreviousPosition() >= player.getCurrentPosition()+1)
+    {
+      if(snakesAndLadders[player.getCurrentPosition()] !== undefined)
       {
-        if(snakesAndLadders[player.getCurrentPosition()] !== undefined)
-        {
-            player.setCurrentPosition(snakesAndLadders[player.getCurrentPosition()])
-            logic.setPosition(player.getCurrentPosition());
-            player.setPosition(await logic.getFinalPosition())
-            player.setPreviousPosition(player.getCurrentPosition());
-        }
-        repaint()
-        return;
+          player.setCurrentPosition(snakesAndLadders[player.getCurrentPosition()])
+          logic.setPosition(player.getCurrentPosition());
+          player.setPosition(await logic.getFinalPosition())
+          player.setPreviousPosition(player.getCurrentPosition());
       }
-      else
+      if(player.isWinner)
       {
+          winnerDiv.style.display = "block";
+          winnerH3.innerText = player.getName()+" is The Winner";
+          resetGame()
+      }
+      repaint()
+      return;
+    }
+    else if(checkWinner(player))
+    {
+      logic.setPosition(player.getPreviousPosition());
+      player.setPosition(await logic.getFinalPosition())
+      player.setPreviousPosition(player.getPreviousPosition()+1);
+      repaint()
+      await sleep(300);
+      animation(player)
+    }
+}
 
-        player.setPreviousPosition(player.getPreviousPosition()+1);
-        logic.setPosition(player.getPreviousPosition());
-        player.setPosition(await logic.getFinalPosition())
-        repaint()
-        await sleep(300);
-        animation(player)
-      }
+function checkIfEmpty(player)
+{
+    if(activePlayers.length === 0 )
+    {
+        player.setPreviousPosition(0);
+        player.setCurrentPosition(0);
+        return true;
+    }
+    return false
+}
+
+function checkWinner(player)
+{
+    if(player.getCurrentPosition() == 100) {
+        player.setWinner(true);
+        anyWinner = true;
+        return true;
+    }
+    else if(player.getCurrentPosition() > 100) {
+        player.setCurrentPosition(player.getPreviousPosition());
+        return false;
+    }
+   return true;
 }
 
 async function autoTurns()
 {
  		//assign current player
          let currentPlayer = activePlayers[currenPlayerNumber];
+         if(currentPlayer == undefined)
+         {
+            return;
+         }
          //set the player label text that has the turn
-         area.innerText += currentPlayer.getName() + " Turn";
+         turnH2.innerText = currentPlayer.getName()+" Turn";
          //make the current player active
          currentPlayer.setActive(true);
          //make the play button disable
          play.disabled = true;
          //if current player is pc and active
-         if(currentPlayer.isPc && currentPlayer.isActive() )
+         if(currentPlayer.isPc && currentPlayer.isActive() && !anyWinner)
          {
-            await sleep(3000)
+            await sleep(autoTurnsDelay)
             //get the dice and turns of the current pc 
             turns(currentPlayer);
             //increase the currentPlayerNumber to get it at line 156
@@ -248,7 +332,7 @@ async function autoTurns()
             autoTurns();
 
         }
-         else if(!currentPlayer.isPc && currentPlayer.isActive() )
+         else if(!currentPlayer.isPc && currentPlayer.isActive() && !anyWinner)
          {
              //waiting the user to play make true at line 123 if the user playes
              if(player.getId() == currentPlayer.getId())
@@ -303,4 +387,24 @@ function increaseCurrentPlayerNumber()
     {
         currenPlayerNumber++;
     }
+}
+
+function resetGame()
+{
+    for(let i = 0;i<activePlayers.length;i++)
+    {
+        let current = activePlayers[i];
+        current.setCurrentPosition(0)
+        current.setPreviousPosition(0);
+        current.setPosition([-50,-50]);
+        current.setActive(false);
+        current.setWinner(false);
+    }
+    colors = ["Orange","Red","Blue","Green","Black","Yellow"]
+   activePlayers = [];
+   currenPlayerNumber = 0;
+   played = false;
+   anyWinner = false;
+   repaint()
+
 }
