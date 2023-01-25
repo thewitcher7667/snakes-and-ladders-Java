@@ -27,7 +27,6 @@ io.on("connection",(Socket)=>{
     Socket.on("Party",(party)=>{
         party = JSON.parse(party);
         addPlayer(party);
-        console.log(party);
         Socket.join(party.party);
 
         io.to(Socket.id).emit("Messges",`Current Party : ${party.party}`);
