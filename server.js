@@ -18,12 +18,16 @@ app.get("/",(req,res)=>{
     res.render(index);
 })
 
+app.get("/api/info/party",(req,res)=>{
+    res.send(parties);
+})
+
 io.on("connection",(Socket)=>{
     //create new party or join exsiting party
     Socket.on("Party",(party)=>{
         party = JSON.parse(party);
         addPlayer(party);
-        
+        console.log(party);
         Socket.join(party.party);
 
         io.to(Socket.id).emit("Messges",`Current Party : ${party.party}`);

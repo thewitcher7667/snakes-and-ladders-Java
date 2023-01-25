@@ -162,6 +162,13 @@ public class TurnsAndPlayers extends OfflinePanel{
 						List<Player> players = mapper.readValue(
 								arg0[0].toString(), 
 						        new TypeReference<List<Player>>(){});
+						Logic logic = new Logic();
+						for(int i = 0;i<players.size();i++)
+						{
+							logic.setPosition(players.get(i).getCurrentPosition());
+							players.get(i).setPosition(logic.getFinalPosition());
+							
+						}
 				   	    setActivePlayers(players);
 				   	    if(isFirstTime())
 				   	    {

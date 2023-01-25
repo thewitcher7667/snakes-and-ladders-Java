@@ -29,17 +29,25 @@ let onlineButt = document.getElementById("onlineButt");
 let online = document.getElementById("online");
 let backOnline = document.getElementById("backOnline");
 let turnH2 = document.getElementById("turnH2");
+let creatPartyButt = document.getElementById("creatPartyButt");
+let creatPartyTxt = document.getElementById("creatPartyTxt");
+let joinPartyButt = document.getElementById("joinPartyButt");
+let joinPartyTxt = document.getElementById("joinPartyTxt");
+let playerNumbersDiv= document.getElementById("playerNumbersDiv");
 
 let player = new Player("player",false);
-player.setId(random(100000,0));
+player.id = random(100000,0);
 let colors = ["Orange","Red","Blue","Green","Black","Yellow"]
 let comps = [new Player("pc1",true),new Player("pc2",true),new Player("pc3",true),new Player("pc4",true),new Player("pc5",true)]
 let activePlayers = [];
 let logic;
-let currenPlayerNumber;
+let currenPlayerNumber = 0;
 let played = false;
 let anyWinner = false;
 let autoTurnsDelay = 2000;
+let game = new Game(false);
+let socket;
+let admin = false;
 let snakesAndLadders = {
     1:38,
     4:14,
@@ -63,6 +71,7 @@ let snakesAndLadders = {
 onlineButt.addEventListener("click",()=>{
     firstPanel.style.display = "none"
     online.style.display = "block";
+    socket = io();
 })
 
 backOnline.addEventListener("click",()=>{
@@ -75,9 +84,10 @@ settingButt.addEventListener("click", ()=>{
 });
 
 applySetting.addEventListener("click", ()=>{
-    if(document.getElementById("nameSetting").value != "" && document.getElementById("nameSetting").value.length <20)
+    let nameSetting = document.getElementById("nameSetting");
+    if(nameSetting.value != "" && nameSetting.value.length <20)
     {
-        player.setName(document.getElementById("nameSetting").value);
+        player.name = document.getElementById("nameSetting").value;
         errorSetting.innerText = "Saved"
     }
     else
@@ -91,6 +101,7 @@ closeSetting.addEventListener("click", ()=>{
 });
 
 offlineButt.addEventListener("click",()=>{
+    game.online = false;
     OfflineDiv.style.display = "block";
 })
 
@@ -112,6 +123,11 @@ function back()
     resetGame();
     firstPanel.style.display = "block";
     ofllineGame.style.display = "none";
+    if(game.online)
+    {
+        socket.disconnect()
+    }
+    area.innerText = "";
 }
 
 PlayAgainButt.addEventListener("click", ()=>{
@@ -119,31 +135,34 @@ PlayAgainButt.addEventListener("click", ()=>{
     OfflineDiv.style.display = "block";
 })
 
-applyOffline.addEventListener("click",()=>{
+applyOffline.addEventListener("click",async ()=>{
     resetGame();
-    activePlayers.push(player);
-    player.setColor(colors[playerColor.selectedIndex]);
+    player.color = (colors[playerColor.selectedIndex]);
     colors.splice(playerColor.selectedIndex,1);
-
-    for(let i = 0 ;i<=playerNumber.selectedIndex;i++)
+    if(!game.online)
     {
-        comps[i].setColor(colors[0]);
-        activePlayers.push(comps[i]);
-        colors.splice(0,1);
+        activePlayers.push(player);
+        for(let i = 0 ;i<=playerNumber.selectedIndex ;i++)
+        {
+            comps[i].color  = (colors[0]);
+            activePlayers.push(comps[i]);
+            colors.splice(0,1);
+        }
+        activePlayers = shuffle(activePlayers);
     }
-    activePlayers = shuffle(activePlayers);
+    else
     OfflineDiv.style.display = "none";
     firstPanel.style.display = "none";
     ofllineGame.style.display = "flex";
     currenPlayerNumber = 0;
     drawDice(0);
     getWindowSize();
-    autoTurns();
+    game.autoTurns();
 })
 
 play.addEventListener("click",async ()=>{
     played = true;
-    autoTurns();
+    game.autoTurns();
 })
 
 function drawDice(rand)
@@ -207,6 +226,60 @@ async function drawImageActualSize()
     ctx.drawImage(this, 0, 0, this.width, this.height);
 
     logic = new Logic(this.width,this.height)
+
+    if(game.online)
+    {
+        playerNumbersDiv.style.display = "block";
+        online.style.display = "none";
+        socket.emit("Party",JSON.stringify(player))
+        if(admin)
+        {
+            socket.emit("Size",playerNumber.selectedIndex+2)
+        }
+        let playersSize ;
+        let partySize;
+        socket.emit("Setting","");
+
+        socket.on("Setting",a=>{
+            partySize = a;
+        })
+
+        socket.emit("ActivePlayers","\"\"");
+        socket.on("ActivePlayers",async a=>{
+            playersSize = a.length;
+            if(partySize === playersSize)
+            {
+                activePlayers = await a;
+            }
+            else
+            {
+                area.innerText += "Waiting players \n"
+            }
+            for(let i = 0;i<a.length;i++)
+            {
+                logic.setPosition(a[i].currentPosition)
+                a[i].position = await logic.getFinalPosition();
+                if(a[i].currentPosition === 100)
+                {
+                    winnerDiv.style.display = "block";
+                    winnerH3.innerText = a[i].name+" is The Winner";
+                    resetGame()
+                }
+            }
+            repaint();
+        })
+
+        socket.on("CurrentPlayer",a=>{
+            currenPlayerNumber = a;
+            game.autoTurns();
+
+        })
+
+        socket.on("Messges",msg=>{
+            area.innerText += msg + "\n"; 
+        })
+    }
+
     drawPlayers(this.width,this.height);
 
 }
@@ -220,140 +293,34 @@ function drawPlayers(width)
         let size = width/30;
         circlesCtx.fillStyle = "black";
         circlesCtx.font = `bold 20px Arial`;
-        circlesCtx.fillText(activePlayers[i].getName(), activePlayers[i].getPosition()[0]-20, activePlayers[i].getPosition()[1]-20);
-        circlesCtx.arc(activePlayers[i].getPosition()[0] , activePlayers[i].getPosition()[1], size, 0, 2 * Math.PI);
-        circlesCtx.fillStyle = activePlayers[i].getColor();
+        circlesCtx.fillText(activePlayers[i].name, activePlayers[i].position[0]-20, activePlayers[i].position[1]-20);
+        circlesCtx.arc(activePlayers[i].position[0] , activePlayers[i].position[1], size, 0, 2 * Math.PI);
+        circlesCtx.fillStyle = activePlayers[i].color;
         circlesCtx.fill();
         circlesCtx.lineWidth = 3;
         circlesCtx.closePath();
     }
 }
 
-async function turns(player)
-{
-    if(checkIfEmpty(player))
-    {
-      return;
-    }
-    let rand = await diceRandom();
-    player.setPreviousPosition(player.getCurrentPosition());
-    player.setCurrentPosition(player.getCurrentPosition()+rand);
+creatPartyButt.addEventListener("click",()=>{
+    let rand = random(100000,0);
+    let partyName = creatPartyTxt.value + rand;
+    player.party = partyName;
+    game.online = true;
+    OfflineDiv.style.display = "block";
+    admin = true;
+})
 
-    area.innerText += player.getName() + " : Played " + rand + "\n";
-    animation(player)
-}
+joinPartyButt.addEventListener("click",()=>{
+    let partyName = joinPartyTxt.value ;
+    player.party = partyName;
+    game.online = true;
+    playerNumbersDiv.style.display = "none";
+    OfflineDiv.style.display = "block";
+    admin = false;
+})
 
-async function animation(player)
-{
-    if(checkIfEmpty(player))
-    {
-      return;
-    }
-    autoTurnsDelay = 300 * (player.getCurrentPosition() - player.getPreviousPosition()) + 2000;
-    if(player.getPreviousPosition() >= player.getCurrentPosition()+1)
-    {
-      if(snakesAndLadders[player.getCurrentPosition()] !== undefined)
-      {
-          player.setCurrentPosition(snakesAndLadders[player.getCurrentPosition()])
-          logic.setPosition(player.getCurrentPosition());
-          player.setPosition(await logic.getFinalPosition())
-          player.setPreviousPosition(player.getCurrentPosition());
-      }
-      if(player.isWinner)
-      {
-          winnerDiv.style.display = "block";
-          winnerH3.innerText = player.getName()+" is The Winner";
-          resetGame()
-      }
-      repaint()
-      return;
-    }
-    else if(checkWinner(player))
-    {
-      logic.setPosition(player.getPreviousPosition());
-      player.setPosition(await logic.getFinalPosition())
-      player.setPreviousPosition(player.getPreviousPosition()+1);
-      repaint()
-      await sleep(300);
-      animation(player)
-    }
-}
-
-function checkIfEmpty(player)
-{
-    if(activePlayers.length === 0 )
-    {
-        player.setPreviousPosition(0);
-        player.setCurrentPosition(0);
-        return true;
-    }
-    return false
-}
-
-function checkWinner(player)
-{
-    if(player.getCurrentPosition() == 100) {
-        player.setWinner(true);
-        anyWinner = true;
-        return true;
-    }
-    else if(player.getCurrentPosition() > 100) {
-        player.setCurrentPosition(player.getPreviousPosition());
-        return false;
-    }
-   return true;
-}
-
-async function autoTurns()
-{
- 		//assign current player
-         let currentPlayer = activePlayers[currenPlayerNumber];
-         if(currentPlayer == undefined)
-         {
-            return;
-         }
-         //set the player label text that has the turn
-         turnH2.innerText = currentPlayer.getName()+" Turn";
-         //make the current player active
-         currentPlayer.setActive(true);
-         //make the play button disable
-         play.disabled = true;
-         //if current player is pc and active
-         if(currentPlayer.isPc && currentPlayer.isActive() && !anyWinner)
-         {
-            await sleep(autoTurnsDelay)
-            //get the dice and turns of the current pc 
-            turns(currentPlayer);
-            //increase the currentPlayerNumber to get it at line 156
-            increaseCurrentPlayerNumber();
-            //set the current player activity to false
-            currentPlayer.setActive(false);
-           //call the method again
-            autoTurns();
-
-        }
-         else if(!currentPlayer.isPc && currentPlayer.isActive() && !anyWinner)
-         {
-             //waiting the user to play make true at line 123 if the user playes
-             if(player.getId() == currentPlayer.getId())
-             {
-                 //if is the user set the button to true
-                 play.disabled = false;
-                if(played == true)
-                 {
-                     increaseCurrentPlayerNumber();
-                     //set the buuton to disable again after playing
-                     play.disabled = true;
-                     turns(currentPlayer);
-                     played = false;
-                     currentPlayer.setActive(false);
-                     autoTurns();	
-                 }
-             }
- 
-         }	 
-}
-
+//helping functions
 function repaint()
 { 
     circlesCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -394,11 +361,11 @@ function resetGame()
     for(let i = 0;i<activePlayers.length;i++)
     {
         let current = activePlayers[i];
-        current.setCurrentPosition(0)
-        current.setPreviousPosition(0);
-        current.setPosition([-50,-50]);
-        current.setActive(false);
-        current.setWinner(false);
+        current.currentPosition = 0
+        current.previousPosition = 0;
+        current.position = [-50,-50];
+        current.active = false;
+        current.isWinner = false;
     }
     colors = ["Orange","Red","Blue","Green","Black","Yellow"]
    activePlayers = [];

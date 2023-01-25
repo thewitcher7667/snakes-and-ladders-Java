@@ -7,6 +7,7 @@
     <link rel="Stylesheet" href="index.css">
     <script defer src="Player.js"></script>
     <script defer src="logic.js"></script>
+    <script defer src="Game.js"></script>
     <script defer src="index.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <title>Snakes And Ladders</title>
@@ -76,24 +77,26 @@
 
     <div id="OfflineDiv" class="outerSetting" style="display:none;">
         <div class="innerSetting">
-            <label for="playerNumber">Enter player Number : </label>
-            <select id="playerNumber">
-                <option>
-                    2
-                </option>
-                <option>
-                    3
-                </option>
-                <option>
-                    4
-                </option>
-                <option>
-                    5
-                </option>
-                <option>
-                    6
-                </option>
-            </select>
+            <div id="playerNumbersDiv">
+                <label for="playerNumber">Enter player Number : </label>
+                <select id="playerNumber">
+                    <option>
+                        2
+                    </option>
+                    <option>
+                        3
+                    </option>
+                    <option>
+                        4
+                    </option>
+                    <option>
+                        5
+                    </option>
+                    <option>
+                        6
+                    </option>
+                </select>
+            </div>
             <br/>
             <label for="playerColor">choose your color : </label>
             <select id="playerColor">
