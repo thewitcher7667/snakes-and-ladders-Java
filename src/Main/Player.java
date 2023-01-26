@@ -18,6 +18,7 @@ public class Player {
 	private boolean isPc;
 	private boolean isWinner;
 	private String party;
+	public int animation;
 	
 	Player()
 	{
@@ -41,7 +42,9 @@ public class Player {
 		setColor("White");
 		setPc(false);
 		setWinner(false);
+		animation = 0;
 	}
+
 	
 	Player(String name,boolean isPc)
 	{
@@ -53,6 +56,7 @@ public class Player {
 		setColor("White");
 		setPc(isPc);
 		setWinner(false);
+		animation = 0;
 	}
 	
 	public String getName() {

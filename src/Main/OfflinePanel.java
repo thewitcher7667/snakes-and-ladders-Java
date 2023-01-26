@@ -167,27 +167,38 @@ public class OfflinePanel extends JPanel{
 		rolledDice = dice.getFinalRandom(1,6);
 		
 		//condition if the current position is 100
-		
+       player.animation = player.getCurrentPosition();
 	   player.setPreviousPosition(player.getCurrentPosition());
 	   player.setCurrentPosition(player.getCurrentPosition() + rolledDice);
 	   
 	   addText(player.getName() + " Played "+rolledDice);
 	   
-	   animation(player); 
-		   
-	   System.out.println(player.getName()+" : "+ Arrays.toString(player.getPosition()) + " " + player.getCurrentPosition() );
+		if(online)
+		{
+      	    updateOnline();
+		}
+		else
+		{
+			   animation(player,true); 
 
+		}
+	  	   repaint();
+
+	   System.out.println(player.getName()+" : "+ Arrays.toString(player.getPosition()) + " " + player.getCurrentPosition() );
 	   
-  	   repaint();
 	}
 	
-	void animation(Player player)
+	void animation(Player player,boolean first)
 	{
+		if(first)
+		{
+			player.animation = player.getPreviousPosition();
+		}
       int delay = 300; //milliseconds
        autoTurnsDelay = delay * (player.getCurrentPosition() - player.getPreviousPosition()) + 2000;
    	 ActionListener taskPerformer = new ActionListener() {
          public void actionPerformed(ActionEvent e) {
-     		if(player.getPreviousPosition() >= player.getCurrentPosition()+1)
+     		if(player.animation >= player.getCurrentPosition()+1)
      		{
      			if(laddersAndSnakes.get(player.getCurrentPosition()) != null)
      			{
@@ -195,11 +206,8 @@ public class OfflinePanel extends JPanel{
      	         	 l.setPosition(player.getCurrentPosition());
      	        	 player.setPosition(l.getFinalPosition());
      	           	 player.setPreviousPosition(player.getCurrentPosition());
+     	           	 player.animation = player.getCurrentPosition();
      	           	 repaint();
-     			}
-     			if(online)
-     			{
-               	    updateOnline();
      			}
      			if(player.isWinner())
      			{
@@ -210,17 +218,13 @@ public class OfflinePanel extends JPanel{
      		}
      		else if(checkWinner(player))
      		{
-           	   l.setPosition(player.getPreviousPosition());
+           	   l.setPosition(player.animation);
          	   player.setPosition(l.getFinalPosition());
-               player.setPreviousPosition(player.getPreviousPosition()+1);
+               player.animation  +=  1;
                repaint();
-               animation(player);	
+               animation(player,false);	
                return;
      		}
- 			if(online)
- 			{
-           	    updateOnline();
- 			}
          }
      };
      //the timer
@@ -361,6 +365,18 @@ public class OfflinePanel extends JPanel{
         {
             currenPlayerNumber++;
         }
+	}
+	
+	int decreaseCurrentNumber()
+	{
+		if(currenPlayerNumber == 0 )
+		{
+			return activePlayers.size()-1;
+		}
+		else
+		{
+			return currenPlayerNumber - 1;
+		}
 	}
 	
 	void setActivePlayers(List<Player> activePlayers)

@@ -174,7 +174,6 @@ public class TurnsAndPlayers extends OfflinePanel{
 				   	    {
 					   	    area.append("Game Started\n");
 				   	    }
-				   	  repaint();
 				   	 setFirstTime(false);
 				   	checkWinnerOnline();
 					} catch (JsonMappingException e) {
@@ -188,7 +187,8 @@ public class TurnsAndPlayers extends OfflinePanel{
 				@Override
 				public void call(Object... arg0) {
 					currenPlayerNumber =(int) arg0[0];
-				   	 autoTurns();
+					animation(OfflinePanel.activePlayers.get(decreaseCurrentNumber()),true);
+					autoTurns();
 				}
 			});	
 		}

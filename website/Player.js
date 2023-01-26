@@ -9,6 +9,7 @@ class Player{
 	winner;
 	party;
 	position;
+	animation;
 	
 	constructor(name,isPc)
 	{
@@ -21,5 +22,6 @@ class Player{
 		this.color = "White";
 		this.pc = isPc
 		this.winner = false;
+		this.animation= 0 ;
 	}
 }

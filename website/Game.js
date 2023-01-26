@@ -13,28 +13,35 @@ async turns(player)
       return;
     }
     let rand = await diceRandom();
+    player.animation = player.currentPosition;
     player.previousPosition = player.currentPosition;
     player.currentPosition  = player.previousPosition+rand;
 
-    if(online)
+    if(this.online)
     {
         socket.emit("Messges",player.name + " : Played " + rand )
+        this.updateOnline();
     }
     else
     {
+        this.animation(player,true)
         area.innerText += player.name + " : Played " + rand + "\n";
     }
-    this.animation(player)
 }
 
-async animation(player)
+async animation(player,first)
 {
+    console.log(first)
+    if(first)
+    {
+        player.animation = player.previousPosition;
+    }
     if(this.checkIfEmpty(player))
     {
       return;
     }
     autoTurnsDelay = 300 * (player.currentPosition - player.previousPosition) + 2000;
-    if(player.previousPosition >= player.currentPosition+1)
+    if(player.animation >= player.currentPosition+1)
     {
       if(snakesAndLadders[player.currentPosition] !== undefined)
       {
@@ -42,12 +49,8 @@ async animation(player)
           logic.setPosition(player.currentPosition);
           player.position = await logic.getFinalPosition()
           player.previousPosition = player.currentPosition;
+          player.animation = player.currentPosition;
       }  
-
-      if(online)
-      {
-         this.updateOnline();
-      }
       if(player.winner)
       {
           winnerDiv.style.display = "block";
@@ -59,12 +62,13 @@ async animation(player)
     }
     else if(this.checkWinner(player))
     {
-      logic.setPosition(player.previousPosition);
+      logic.setPosition(player.animation);
       player.position = await logic.getFinalPosition()
-      player.previousPosition = player.previousPosition+1;
+      player.animation += 1;
       repaint()
       await sleep(300);
-      this.animation(player)
+      this.animation(player,false)
+      return;
     }
 
 
@@ -95,10 +99,6 @@ checkWinner(player)
     }
     else if(player.currentPosition > 100) {
         player.currentPosition = player.previousPosition
-        if(online)
-        {
-           this.updateOnline();
-        }
         return false;
     }
    return true;

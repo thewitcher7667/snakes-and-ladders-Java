@@ -150,7 +150,6 @@ applyOffline.addEventListener("click",async ()=>{
         }
         activePlayers = shuffle(activePlayers);
     }
-    else
     OfflineDiv.style.display = "none";
     firstPanel.style.display = "none";
     ofllineGame.style.display = "flex";
@@ -271,6 +270,7 @@ async function drawImageActualSize()
 
         socket.on("CurrentPlayer",a=>{
             currenPlayerNumber = a;
+            game.animation(activePlayers[decreaseCurrentNumber()],true)
             game.autoTurns();
 
         })
@@ -313,6 +313,10 @@ creatPartyButt.addEventListener("click",()=>{
 
 joinPartyButt.addEventListener("click",()=>{
     let partyName = joinPartyTxt.value ;
+    if(partyName === "")
+    {
+        partyName =  random(100000,0);
+    }
     player.party = partyName;
     game.online = true;
     playerNumbersDiv.style.display = "none";
@@ -353,6 +357,18 @@ function increaseCurrentPlayerNumber()
     else
     {
         currenPlayerNumber++;
+    }
+}
+
+function decreaseCurrentNumber()
+{
+    if(currenPlayerNumber == 0 )
+    {
+        return activePlayers.length-1;
+    }
+    else
+    {
+        return currenPlayerNumber - 1;
     }
 }
 
