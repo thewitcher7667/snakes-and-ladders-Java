@@ -37,7 +37,7 @@ public class OnlinePanel extends JPanel{
 	{
                
             try {
-                s = IO.socket("http://localhost:3000");
+                s = IO.socket("https://snakes-and-ladders.onrender.com/");
 
                 s.open();
             } catch (URISyntaxException ex) {
