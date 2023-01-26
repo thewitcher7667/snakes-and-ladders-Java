@@ -31,7 +31,6 @@ async turns(player)
 
 async animation(player,first)
 {
-    console.log(first)
     if(first)
     {
         player.animation = player.previousPosition;
