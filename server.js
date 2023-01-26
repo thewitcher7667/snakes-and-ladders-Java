@@ -4,7 +4,7 @@ app.use(express.static('website'));
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 let parties = {
     PartyIsFull : {
@@ -119,6 +119,6 @@ function creatParty(party,size)
     };
 }
 
-server.listen(process.env.PORT || port,()=>{
+server.listen(port,()=>{
     console.log("Listen at port ",port);
 })
