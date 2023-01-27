@@ -379,15 +379,17 @@ function resetGame()
         let current = activePlayers[i];
         current.currentPosition = 0
         current.previousPosition = 0;
+        current.animation = 0;
         current.position = [-50,-50];
         current.active = false;
-        current.isWinner = false;
+        current.winner = false;
     }
     colors = ["Orange","Red","Blue","Green","Black","Yellow"]
    activePlayers = [];
    currenPlayerNumber = 0;
    played = false;
    anyWinner = false;
+   area.innerText = "";
    repaint()
 
 }

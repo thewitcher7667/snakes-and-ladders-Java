@@ -67,7 +67,6 @@ async animation(player,first)
       repaint()
       await sleep(300);
       this.animation(player,false)
-      return;
     }
 
 
@@ -91,7 +90,7 @@ checkIfEmpty(player)
 
 checkWinner(player)
 {
-    if(player.previousPosition == 100) {
+    if(player.currentPosition == 100) {
         player.winner = true;
         anyWinner = true;
         return true;
