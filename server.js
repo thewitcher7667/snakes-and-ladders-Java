@@ -22,6 +22,10 @@ app.get("/api/info/party",(req,res)=>{
     res.send(parties);
 })
 
+app.get("/download/software",(req,res)=>{
+    res.download("./website/snakes and ladders.jar");
+})
+
 io.on("connection",(Socket)=>{
     //create new party or join exsiting party
     Socket.on("Party",(party)=>{
