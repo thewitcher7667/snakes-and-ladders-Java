@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 public class BoardAndXY extends JPanel{
 
 	Style style;
-    Image board ;
+    ImageIcon board ;
     private List<Player> players;
     int ovalSize;
     
@@ -22,7 +22,7 @@ public class BoardAndXY extends JPanel{
 	{
    	    style = new Style();
    	    style.panels(this, Color.decode("#00023F"), 617, 610);
-   	    board = new ImageIcon("game.png").getImage();
+    	board = new ImageIcon(getClass().getClassLoader().getResource("game.png"));
    	    ovalSize = 40;
 	}
 	
@@ -33,7 +33,7 @@ public class BoardAndXY extends JPanel{
    	 d.setColor(Color.decode("#00023F"));
    	 d.fillRect(0, 0, getWidth(), getHeight());
 
-   	 d.drawImage(board,0,0,null);   	 
+	 board.paintIcon(this,g,0,0);   	 
    	 
    	 players = OfflinePanel.activePlayers;
    	 
