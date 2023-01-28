@@ -45,6 +45,11 @@ public class Dice extends JPanel{
 	
 	private void animation(int min,int max)
 	{
+		/*
+		 * it is bad to call the paint method side effects >> blinks the canvas and it is noticeable 
+		 * we didn't call it on another thread like code in class OfflinePanel 
+		 * Because we need to wait the whole thread for the value of the random 
+		 */
 		for(int i=0;i<4;i++)
 		{
 			finalRandom = random(min,max);
@@ -62,10 +67,5 @@ public class Dice extends JPanel{
 	{
 		animation(min,max);
 		return finalRandom;
-	}
-	
-	int getRandomNoAnimation(int min,int max)
-	{
-		return random(min,max);
 	}
 }

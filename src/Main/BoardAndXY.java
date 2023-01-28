@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -17,11 +16,13 @@ public class BoardAndXY extends JPanel{
     ImageIcon board ;
     private List<Player> players;
     int ovalSize;
+	public static final int boardX = 617;
+	public static final int boardY = 610;
     
 	BoardAndXY()
 	{
    	    style = new Style();
-   	    style.panels(this, Color.decode("#00023F"), 617, 610);
+   	    style.panels(this, Color.decode("#00023F"), boardX, boardY);
     	board = new ImageIcon(getClass().getClassLoader().getResource("game.png"));
    	    ovalSize = 40;
 	}
@@ -39,7 +40,6 @@ public class BoardAndXY extends JPanel{
    	 
    	 for(int i =0 ;i<players.size();i++)
    	 {
-   		 //System.out.print(players.get(i).getPosition()[0]+" "+players.get(i).getPosition()[1]);
    	   	 d.drawOval(players.get(i).getPosition()[0], players.get(i).getPosition()[1], ovalSize, ovalSize);
    	   	 d.setColor(OfflinePanel.ColorsHashMap.get(players.get(i).getColor()));
    	   	 d.fillOval(players.get(i).getPosition()[0], players.get(i).getPosition()[1], ovalSize, ovalSize);

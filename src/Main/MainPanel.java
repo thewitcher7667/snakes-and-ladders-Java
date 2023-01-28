@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import Online.OnlinePanel;
 
 @SuppressWarnings("serial")
+//make the class as JPanel
 public class MainPanel extends JPanel{
      private JLabel label;
      private JButton offline;
@@ -19,24 +20,36 @@ public class MainPanel extends JPanel{
      
      public MainPanel()
      {
-    	 this.setLayout(new FlowLayout(FlowLayout.CENTER,900,100));
+    	 /*
+    	  *  set layout FlowLayout
+    	  *  specify its width to the frame width to center the elements
+    	  *  specify height to 100 to leave some space between butts
+    	  */
+    	 this.setLayout(new FlowLayout(FlowLayout.CENTER,main.screenWidth,100));
+    	 
+    	 //initialization of elements 
     	 label = new JLabel("Snakes and Ladders",JLabel.CENTER);
     	 offline = new JButton("Offline");
     	 online = new JButton("Online");
     	 setting = new JButton("Setting");
     	 style = new Style();
     	 
-    	 style.panels(this, Color.decode("#00023F"),900, 700);
+    	 style.panels(this, Color.decode("#00023F"),main.screenWidth, main.screenHeigth);
     	 
     	 style.labels(label, 30, Color.decode("#FFB756"));
    	     
-   	     style.buttons(offline, Color.decode("#FF4E33"), 10, 50, 10, 50);
+    	 int buttonTop = 10 ;
+    	 int buttonRight = 50;
+    	 int buttonBottom = 10;
+    	 int buttonLeft = 50;
+    	 
+   	     style.buttons(offline, Color.decode("#FF4E33"), buttonTop, buttonRight, buttonBottom, buttonLeft);
    	     offline.addActionListener(e -> offlineButtonAction());
    	     
-   	     style.buttons(online, Color.decode("#FF4E33"), 10, 50, 10, 50);
+   	     style.buttons(online, Color.decode("#FF4E33"), buttonTop, buttonRight, buttonBottom, buttonLeft);
    	     online.addActionListener(e -> onlineButtonAction());
    	     
-   	     style.buttons(setting, Color.decode("#FF4E33"), 10, 50, 10, 50);
+   	     style.buttons(setting, Color.decode("#FF4E33"), buttonTop, buttonRight, buttonBottom, buttonLeft);
    	     setting.addActionListener(e -> settingButtonAction());
     	 
     	 add(label);
@@ -44,11 +57,6 @@ public class MainPanel extends JPanel{
     	 add(online);
     	 add(setting);
     	
-     }
-     
-     public JPanel getPanel()
-     {
-    	 return this;
      }
      
      private void offlineButtonAction()

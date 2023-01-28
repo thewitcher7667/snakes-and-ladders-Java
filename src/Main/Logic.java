@@ -3,8 +3,6 @@ package Main;
 public class Logic {
 
 	private int position;
-	private final int boardX = 617;
-	private final int boardY = 610;
 	private int[] finalPosition;
 	
 	Logic()
@@ -29,7 +27,7 @@ public class Logic {
 		        }
 		        else
 		        {
-		           return boardX-50;
+		           return BoardAndXY.boardX-50;
 		        }
 		    }
 
@@ -63,7 +61,7 @@ public class Logic {
 	
 	private int boardY(int number)
 	{
-		return boardY - (number * 60);
+		return BoardAndXY.boardY - (number * 60);
 	}
 	
 	boolean isPrime(int number)
